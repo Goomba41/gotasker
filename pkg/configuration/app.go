@@ -20,24 +20,24 @@ type DatabaseConfig struct {
 	TimeZone string `mapstructure:"timezone"`
 }
 
-func Init() (*Config, error) {
+func Init(path string) (*Config, error) {
 	v := viper.New()
 
 	v.SetConfigName("config")
 	v.SetConfigType("json")
-	v.AddConfigPath(".")
+	v.AddConfigPath(path)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, fmt.Errorf("Not found: add config.json to app root directory")
+			return nil, fmt.Errorf("not found: add config.json to directory with executable")
 		} else {
-			return nil, fmt.Errorf("Read configuration file, %w", err)
+			return nil, fmt.Errorf("read configuration file, %w", err)
 		}
 	}
 
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("Parse error: %w", err)
+		return nil, fmt.Errorf("parse error: %w", err)
 	}
 
 	return &cfg, nil

@@ -1,9 +1,10 @@
 package main
 
 import (
-	// "os"
-
+	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	// "github.com/gin-gonic/gin"
 
@@ -12,7 +13,17 @@ import (
 )
 
 func main() {
-	cfg, err := configuration.Init()
+	configPath := flag.String("config", "", "Configuration file path")
+	flag.Parse()
+
+	if *configPath == "" {
+		fmt.Fprintf(flag.CommandLine.Output(), "Error: -config flag is required\n\n")
+		flag.Usage()
+		fmt.Println()
+		os.Exit(1)
+	}
+
+	cfg, err := configuration.Init(*configPath)
 	if err != nil {
 		log.Fatalf("Configuration file error: %v", err)
 	}
