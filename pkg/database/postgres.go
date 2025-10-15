@@ -64,19 +64,19 @@ func applyMigrations() error {
 
 	_, filename, _, _ := runtime.Caller(0)
 	dir := filepath.Dir(filename)
-	migrationsDir := "file://" + filepath.Join(dir, "..", "..", "migrations")
+	migrationsDir := "file://" + filepath.ToSlash(filepath.Join(dir, "..", "..", "migrations"))
 
 	// Создаём экземпляр migrate
 	m, err := migrate.New(migrationsDir, dsn)
 	if err != nil {
-		return fmt.Errorf("Failed to create migrate instance: %w", err)
+		return fmt.Errorf("failed to create migrate instance: %w", err)
 	}
 	defer m.Close()
 
 	// Применяем все миграции вверх
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("Migration failed: %w", err)
+		return fmt.Errorf("migration failed: %w", err)
 	}
 
 	if err == migrate.ErrNoChange {
