@@ -15,7 +15,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"Goomba41/gotasker/pkg/configuration"
+	"goomba41/gotasker/pkg/configuration"
 )
 
 type dsnType string
@@ -31,7 +31,7 @@ var dsnObject configuration.DatabaseConfig
 func SetConfig(dsn configuration.DatabaseConfig) error {
 
 	if dsn == (configuration.DatabaseConfig{}) {
-		return fmt.Errorf("variable is emtpy")
+		return fmt.Errorf("variable is empty")
 	}
 
 	dsnObject = dsn

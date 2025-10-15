@@ -8,8 +8,8 @@ import (
 
 	// "github.com/gin-gonic/gin"
 
-	"Goomba41/gotasker/pkg/configuration"
-	"Goomba41/gotasker/pkg/database"
+	"goomba41/gotasker/pkg/configuration"
+	"goomba41/gotasker/pkg/database"
 )
 
 func main() {

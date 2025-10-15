@@ -1,4 +1,4 @@
-module Goomba41/gotasker
+module goomba41/gotasker
 
 go 1.25.2
 
