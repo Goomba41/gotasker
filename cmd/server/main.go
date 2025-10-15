@@ -3,13 +3,26 @@ package main
 import (
 	// "os"
 
+	"log"
+
 	// "github.com/gin-gonic/gin"
 
+	"Goomba41/gotasker/pkg/configuration"
 	"Goomba41/gotasker/pkg/database"
 )
 
 func main() {
-	// db := connectDB()
+	cfg, err := configuration.Init()
+	if err != nil {
+		log.Fatalf("Configuration file error: %v", err)
+	}
 
-	database.Connect()
+	if err := database.SetConfig(cfg.Database); err != nil {
+		log.Fatalf("Database DSN set error: %v", err)
+	}
+
+	_, err = database.Connect()
+	if err != nil {
+		log.Fatalf("Database connection error: %v", err)
+	}
 }
