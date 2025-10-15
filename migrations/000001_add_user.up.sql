@@ -3,5 +3,5 @@ CREATE TABLE users (
 	email text NOT NULL UNIQUE,
 	"password" text NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
-	CONSTRAINT users_pk PRIMARY KEY (id,email)
+	CONSTRAINT users_pk PRIMARY KEY (id)
 );
