@@ -2,8 +2,8 @@ CREATE TABLE tasks (
 	id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
 	title text NOT NULL,
 	description text,
-  -- status text NOT NULL DEFAULT 'todo'
-  assignee_id bigint NOT NULL,
+	-- status text NOT NULL DEFAULT 'todo'
+	assignee_id bigint NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
 	updated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
 
