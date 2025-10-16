@@ -23,15 +23,18 @@ type DatabaseConfig struct {
 func Init(path string) (*Config, error) {
 	v := viper.New()
 
-	v.SetConfigName("config")
-	v.SetConfigType("json")
+	fn := "config"
+	ft := "json"
+
+	v.SetConfigName(fn)
+	v.SetConfigType(ft)
 	v.AddConfigPath(path)
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, fmt.Errorf("not found: add config.json to directory with executable")
+			return nil, fmt.Errorf("%s.%s not found, %w", fn, ft, err)
 		} else {
-			return nil, fmt.Errorf("read configuration file, %w", err)
+			return nil, fmt.Errorf("read error, %w", err)
 		}
 	}
 

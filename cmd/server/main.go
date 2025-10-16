@@ -25,7 +25,7 @@ func main() {
 
 	cfg, err := configuration.Init(*configPath)
 	if err != nil {
-		log.Fatalf("Configuration file error: %v", err)
+		log.Fatalf("Configuration file: %v", err)
 	}
 
 	if err := database.SetConfig(cfg.Database); err != nil {
