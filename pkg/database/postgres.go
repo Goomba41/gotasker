@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -12,8 +13,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/jackc/pgx/v5"
 
 	"goomba41/gotasker/pkg/configuration"
 )
@@ -23,7 +23,7 @@ type dsnType string
 // Определяем допустимые значения как константы
 const (
 	dsnTypeMigrate dsnType = "migrate"
-	dsnTypeGorm    dsnType = "gorm"
+	dsnTypePGX    dsnType = "pgx"
 )
 
 var dsnObject configuration.DatabaseConfig
@@ -38,16 +38,17 @@ func SetConfig(dsn configuration.DatabaseConfig) error {
 	return nil
 }
 
-func Connect() (*gorm.DB, error) {
-	dsn, err := buildPostgresDSN(dsnTypeGorm)
+func Connect() (*pgx.Conn, error) {
+	dsn, err := buildPostgresDSN(dsnTypePGX)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := pgx.Connect(context.Background(), dsn)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
+	defer db.Close(context.Background())
 
 	if err := applyMigrations(); err != nil {
 		return nil, fmt.Errorf("%w", err)
@@ -97,7 +98,7 @@ func buildPostgresDSN(dsnType dsnType) (string, error) {
 	dsnTemplate := `host={{.Host}} user={{.User}} password={{.Password}} dbname={{.DbName}} port={{.Port}} {{if .SslMode}}sslmode={{.SslMode}}{{end}} {{if .TimeZone}}TimeZone={{.TimeZone}}{{end}}`
 
 	switch dsnType {
-	case "gorm":
+	case "pgx":
 		break
 	case "migrate":
 		dsnTemplate = `postgres://{{.User}}:{{.Password}}@{{.Host}}:{{.Port}}/{{.DbName}}{{if .SslMode}}?sslmode={{.SslMode}}{{end}}`
