@@ -8,6 +8,8 @@ import (
 
 	// "github.com/gin-gonic/gin"
 
+	repositories "goomba41/gotasker/internal/repository"
+	"goomba41/gotasker/internal/repository/db"
 	"goomba41/gotasker/pkg/configuration"
 	"goomba41/gotasker/pkg/database"
 )
@@ -32,8 +34,13 @@ func main() {
 		log.Fatalf("Database DSN set error: %v", err)
 	}
 
-	_, err = database.Connect()
+	connection, err := database.Connect()
 	if err != nil {
 		log.Fatalf("Database connection error: %v", err)
 	}
+
+	queries := db.New(connection)
+
+	/* userRepo := */
+	repositories.NewUserRepository(queries)
 }

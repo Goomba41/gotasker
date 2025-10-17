@@ -3,12 +3,13 @@
   "sql": [
     {
       "engine": "postgresql",
-      "queries": "query.sql",
       "schema": "migrations",
+      "queries": "internal/repository/queries.sql",
       "gen": {
         "go": {
-          "package": "repository",
-          "out": "",
+          "package": "db",
+          "out": "internal/repository/db",
+          "emit_json_tags": true,
           "sql_package": "pgx/v5"
         }
       }
