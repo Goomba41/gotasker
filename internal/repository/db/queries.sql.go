@@ -21,7 +21,7 @@ type CreateUserParams struct {
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.Password)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -38,7 +38,7 @@ RETURNING id, title, description, assignee_id, created_at, updated_at
 `
 
 func (q *Queries) DeleteTasks(ctx context.Context, id int64) (Task, error) {
-	row := q.db.QueryRow(ctx, deleteTasks, id)
+	row := q.db.QueryRowContext(ctx, deleteTasks, id)
 	var i Task
 	err := row.Scan(
 		&i.ID,
@@ -57,7 +57,7 @@ RETURNING id, email, password, created_at
 `
 
 func (q *Queries) DeleteUser(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRow(ctx, deleteUser, id)
+	row := q.db.QueryRowContext(ctx, deleteUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -73,7 +73,7 @@ SELECT id, email, password, created_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -89,7 +89,7 @@ SELECT id, email, password, created_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRow(ctx, getUserById, id)
+	row := q.db.QueryRowContext(ctx, getUserById, id)
 	var i User
 	err := row.Scan(
 		&i.ID,

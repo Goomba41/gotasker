@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"goomba41/gotasker/internal/repository/db"
@@ -12,7 +13,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, email, password string) (*db.User, error)
 	// GetByID(ctx context.Context, id int64) (*db.User, error)
-	// GetByEmail(ctx context.Context, email string) (*db.User, error)
+	GetByEmail(ctx context.Context, email string) (*db.User, error)
 	// Delete(ctx context.Context, id int64) (*db.User, error)
 }
 
@@ -38,5 +39,22 @@ func (r *repository) Create(ctx context.Context, email, password string) (*db.Us
 		return nil, fmt.Errorf("failed to create user in DB: %w", err)
 	}
 
-	return user, nil
+	// TODO приведение к доменной модели через copier
+
+	return &user, nil
+}
+
+// GetByEmail возвращает пользователя по email.
+func (r *repository) GetByEmail(ctx context.Context, email string) (*db.User, error) {
+	user, err := r.queries.GetUserByEmail(ctx, email)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, fmt.Errorf("user not found: %w", errors.New("entity not found"))
+		}
+		return nil, fmt.Errorf("failed to get user by email: %w", err)
+	}
+
+	// TODO приведение к доменной модели через copier
+
+	return /* toModel(user) */ &user, nil
 }

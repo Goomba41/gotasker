@@ -1,7 +1,7 @@
 package database
 
 import (
-	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -13,7 +13,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"goomba41/gotasker/pkg/configuration"
 )
@@ -23,7 +23,7 @@ type dsnType string
 // Определяем допустимые значения как константы
 const (
 	dsnTypeMigrate dsnType = "migrate"
-	dsnTypePGX    dsnType = "pgx"
+	dsnTypePGX     dsnType = "pgx"
 )
 
 var dsnObject configuration.DatabaseConfig
@@ -38,17 +38,16 @@ func SetConfig(dsn configuration.DatabaseConfig) error {
 	return nil
 }
 
-func Connect() (*pgx.Conn, error) {
+func Connect() (*sql.DB, error) {
 	dsn, err := buildPostgresDSN(dsnTypePGX)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	db, err := pgx.Connect(context.Background(), dsn)
+	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
-	defer db.Close(context.Background())
 
 	if err := applyMigrations(); err != nil {
 		return nil, fmt.Errorf("%w", err)

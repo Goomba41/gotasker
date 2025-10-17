@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -38,9 +39,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("Database connection error: %v", err)
 	}
+	defer connection.Close()
 
 	queries := db.New(connection)
 
-	/* userRepo := */
-	repositories.NewUserRepository(queries)
+	userRepo := repositories.NewUserRepository(queries)
+
+	createdUser, err := userRepo.Create(context.Background(), "anton.borodawkin@yandex.ru", "password")
+	if err == nil {
+		log.Printf("Created user: %v", createdUser)
+	}
+
+	gettedUser, err := userRepo.GetByEmail(context.Background(), "anton.borodawkin@yandex.ru")
+	if err == nil {
+		log.Printf("Getted user: %v", gettedUser)
+	}
 }

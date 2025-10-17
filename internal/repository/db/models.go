@@ -5,39 +5,40 @@
 package db
 
 import (
-	"net/netip"
+	"database/sql"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
+	"github.com/sqlc-dev/pqtype"
 )
 
 type AuditLog struct {
-	ID         int64       `json:"id"`
-	UserID     pgtype.Int8 `json:"user_id"`
-	UserEmail  pgtype.Text `json:"user_email"`
-	Action     string      `json:"action"`
-	EntityType string      `json:"entity_type"`
-	EntityID   int64       `json:"entity_id"`
-	OldValues  []byte      `json:"old_values"`
-	NewValues  []byte      `json:"new_values"`
-	IpAddress  *netip.Addr `json:"ip_address"`
-	UserAgent  pgtype.Text `json:"user_agent"`
-	RequestID  pgtype.UUID `json:"request_id"`
-	CreatedAt  time.Time   `json:"created_at"`
+	ID         int64                 `json:"id"`
+	UserID     sql.NullInt64         `json:"user_id"`
+	UserEmail  sql.NullString        `json:"user_email"`
+	Action     string                `json:"action"`
+	EntityType string                `json:"entity_type"`
+	EntityID   int64                 `json:"entity_id"`
+	OldValues  pqtype.NullRawMessage `json:"old_values"`
+	NewValues  pqtype.NullRawMessage `json:"new_values"`
+	IpAddress  pqtype.Inet           `json:"ip_address"`
+	UserAgent  sql.NullString        `json:"user_agent"`
+	RequestID  uuid.NullUUID         `json:"request_id"`
+	CreatedAt  time.Time             `json:"created_at"`
 }
 
 type Task struct {
-	ID          int64              `json:"id"`
-	Title       string             `json:"title"`
-	Description pgtype.Text        `json:"description"`
-	AssigneeID  int64              `json:"assignee_id"`
-	CreatedAt   pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	ID          int64          `json:"id"`
+	Title       string         `json:"title"`
+	Description sql.NullString `json:"description"`
+	AssigneeID  int64          `json:"assignee_id"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
 type User struct {
-	ID        int64              `json:"id"`
-	Email     string             `json:"email"`
-	Password  string             `json:"password"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ID        int64     `json:"id"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	CreatedAt time.Time `json:"created_at"`
 }
