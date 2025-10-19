@@ -106,12 +106,12 @@ func buildPostgresDSN(dsnType dsnType) (string, error) {
 		return "", errors.New("unknown DSN type")
 	}
 
-	tmpl, err := template.New("dsn").Parse(dsnTemplate)
+	templateBody, err := template.New("dsn").Parse(dsnTemplate)
 	if err != nil {
 		return "", fmt.Errorf("%s dsn: %w", dsnType, err)
 	}
 
-	err = tmpl.Execute(&buf, dsnObject)
+	err = templateBody.Execute(&buf, dsnObject)
 	if err != nil {
 		return "", fmt.Errorf("%s dsn: %w", dsnType, err)
 	}

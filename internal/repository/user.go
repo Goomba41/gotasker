@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"goomba41/gotasker/internal/repository/db"
+
+	"github.com/jinzhu/copier"
 )
 
 // Repository — контракт для работы с пользователями.
@@ -34,19 +36,22 @@ func (r *repository) Create(ctx context.Context, email, password string) (*db.Us
 		Password: password,
 	}
 
-	user, err := r.queries.CreateUser(ctx, params)
+	result, err := r.queries.CreateUser(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user in DB: %w", err)
 	}
 
-	// TODO приведение к доменной модели через copier
+	user := db.User{}
+	if err := copier.Copy(&user, &result); err != nil {
+		return nil, fmt.Errorf("failed to create user in DB: %w", err)
+	}
 
 	return &user, nil
 }
 
 // GetByEmail возвращает пользователя по email.
 func (r *repository) GetByEmail(ctx context.Context, email string) (*db.User, error) {
-	user, err := r.queries.GetUserByEmail(ctx, email)
+	result, err := r.queries.GetUserByEmail(ctx, email)
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, fmt.Errorf("user not found: %w", errors.New("entity not found"))
@@ -54,7 +59,10 @@ func (r *repository) GetByEmail(ctx context.Context, email string) (*db.User, er
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
 
-	// TODO приведение к доменной модели через copier
+	user := db.User{}
+	if err := copier.Copy(&user, &result); err != nil {
+		return nil, fmt.Errorf("failed to get user by email: %w", err)
+	}
 
-	return /* toModel(user) */ &user, nil
+	return &user, nil
 }
