@@ -32,25 +32,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const deleteTasks = `-- name: DeleteTasks :one
-DELETE FROM tasks WHERE id = $1
-RETURNING id, title, description, assignee_id, created_at, updated_at
-`
-
-func (q *Queries) DeleteTasks(ctx context.Context, id int64) (Task, error) {
-	row := q.db.QueryRowContext(ctx, deleteTasks, id)
-	var i Task
-	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Description,
-		&i.AssigneeID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const deleteUser = `-- name: DeleteUser :one
 DELETE FROM users WHERE id = $1
 RETURNING id, email, password, created_at
@@ -90,6 +71,31 @@ SELECT id, email, password, created_at FROM users WHERE id = $1
 
 func (q *Queries) GetUserById(ctx context.Context, id int64) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET email=$2, "password"=$3
+WHERE id=$1
+RETURNING id, email, password, created_at
+`
+
+type UpdateUserParams struct {
+	ID       int64  `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.Email, arg.Password)
 	var i User
 	err := row.Scan(
 		&i.ID,
