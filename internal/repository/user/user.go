@@ -1,13 +1,13 @@
-package repositories
+package userRepository
 
 import (
-	"database/sql"
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 
-	"goomba41/gotasker/internal/repository/db"
 	"goomba41/gotasker/internal/dto"
+	"goomba41/gotasker/internal/repository/db"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jinzhu/copier"
@@ -37,7 +37,7 @@ type repository struct {
 }
 
 // NewUserRepository создаёт новый репозиторий для работы с пользователями.
-func NewUserRepository(queries *db.Queries, db DBRunner) Repository {
+func New(queries *db.Queries, db DBRunner) Repository {
 	return &repository{
 		queries: queries,
 		db:      db,
@@ -54,12 +54,12 @@ func (r *repository) Create(ctx context.Context, email, password string) (*db.Us
 
 	result, err := r.queries.CreateUser(ctx, params)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user in DB: %w", err)
+		return nil, fmt.Errorf("User creation failed: %w", err)
 	}
 
 	user := db.User{}
 	if err := copier.Copy(&user, &result); err != nil {
-		return nil, fmt.Errorf("failed to create user in DB: %w", err)
+		return nil, fmt.Errorf("User creation failed: %w", err)
 	}
 
 	return &user, nil
@@ -141,30 +141,30 @@ func (r *repository) Patch(ctx context.Context, id int64, patch dto.UserPatch) (
 	}
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
-		if err != nil {
-			return nil, fmt.Errorf("failed to execute patch query: %w", err)
-		}
-		defer rows.Close()
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute patch query: %w", err)
+	}
+	defer rows.Close()
 
-		if !rows.Next() {
-			return nil, fmt.Errorf("user not found: %w", sql.ErrNoRows)
-		}
+	if !rows.Next() {
+		return nil, fmt.Errorf("user not found: %w", sql.ErrNoRows)
+	}
 
-		var user db.User
-		err = rows.Scan(
-			&user.ID,
-			&user.Email,
-			&user.Password,
-			&user.CreatedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan user: %w", err)
-		}
+	var user db.User
+	err = rows.Scan(
+		&user.ID,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan user: %w", err)
+	}
 
-		// Защита от неожиданного множественного результата
-		if rows.Next() {
-			return nil, errors.New("expected exactly one row, got more")
-		}
+	// Защита от неожиданного множественного результата
+	if rows.Next() {
+		return nil, errors.New("expected exactly one row, got more")
+	}
 
 	return &user, nil
 }

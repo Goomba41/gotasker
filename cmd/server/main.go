@@ -9,9 +9,10 @@ import (
 
 	// "github.com/gin-gonic/gin"
 
-	repositories "goomba41/gotasker/internal/repository"
-	"goomba41/gotasker/internal/repository/db"
+	userRepository "goomba41/gotasker/internal/repository/user"
+	// "goomba41/gotasker/internal/repository/task"
 	"goomba41/gotasker/internal/dto"
+	"goomba41/gotasker/internal/repository/db"
 	"goomba41/gotasker/pkg/configuration"
 	"goomba41/gotasker/pkg/database"
 )
@@ -44,12 +45,7 @@ func main() {
 
 	queries := db.New(connection)
 
-	userRepo := repositories.NewUserRepository(queries, connection)
-
-	createdUser, err := userRepo.Create(context.Background(), "anton.borodawkin@yandex.ru", "password")
-	if err == nil {
-		log.Printf("Created user: %v", createdUser)
-	}
+	userRepo := userRepository.New(queries, connection)
 
 	gettedUser, err := userRepo.GetByEmail(context.Background(), "anton.borodawkin@yandex.ru")
 	if err == nil {
